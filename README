@@ -1,0 +1,52 @@
+parser.py will:
+ - use "requests" python library in order to parse provided URL 'https://play.google.com/store/apps/category/GAME'.
+ - use regex to match all names of games categories in a web-page, as well as links to web-pages of each category.
+ - create output data file "out_data" in a json format so it can be easily wived by human. Structure of a file is
+ {category name : list of games inside collection}
+
+Finally, parser.py will post output data to the public server and return status code (200 in case of success).
+
+----------------------------------------------------------
+
+Further improving:
+
+- when accessing play.google.com browser usually will not load full page at once.
+It's caused by the logic of play.google.com website itself:
+initially browser will load only head of the page and then, when user will scroll page down, AJAX will send additional
+HTTP requests to the web-server.
+
+Workaround can be to open web-page manually, scroll down to the end and then save full HTML locally in order to parse it
+ further.
+Second way is more complicated and require either use of pyhton "selenium" library or writing additional JS script which
+ will scroll down the web-page.
+
+For more information check out following link:
+https://stackoverflow.com/questions/21006940/how-to-load-all-entries-in-an-infinite-scroll-at-once-to-parse-the-html-in-pytho/21008335
+
+
+- when parsing Non-English version of the play.google.com we may get games names in local languages.
+parser.py will still parse and save them to "out_data" but they will be stored as a unicode characters.
+In that case utf-8 encoding should be used in order to make names of some games readable.
+
+
+- if you want to parse https://play.google.com/store/apps/category/GAME" in specific language you just simply add ?hl=en,
+?hl=fr, ?hl=uk etc. to the end of the URL.
+
+- if you want to simulate parsing https://play.google.com/store/apps/category/GAME" from specific country, simply use
+proxies.
+For that you will need to add few lines of code to the "parse" function, for example:
+
+proxies = {
+  'http': 'http://10.10.1.10:3128',
+  'https': 'http://10.10.1.10:1080',
+}
+
+requests.get(url, proxies=proxies)
+
+You may need it because Google tends to use IP information to determine the language you will receive.
+More info here:
+https://www.w3.org/International/questions/qa-lang-priorities
+https://www.w3.org/International/questions/qa-http-and-lang
+
+List of public proxies:
+https://free-proxy-list.net/
